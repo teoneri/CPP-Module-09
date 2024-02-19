@@ -6,7 +6,7 @@
 /*   By: mneri <mneri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 15:23:37 by mneri             #+#    #+#             */
-/*   Updated: 2024/02/13 16:39:59 by mneri            ###   ########.fr       */
+/*   Updated: 2024/02/19 15:07:18 by mneri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include <cstring>
 #include <cctype>
 #include <iomanip>
-
+#include <limits.h>
 class BTC
 {
 	private:
@@ -32,4 +32,6 @@ class BTC
 		~BTC();
 };
 void displayBTC(std::string line, BTC btc);
+void found(BTC btc, std::string value_str, std::string date_str);
+void not_found(BTC btc, std::string value_str, std::string date_str);
 

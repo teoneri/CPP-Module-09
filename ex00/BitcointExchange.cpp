@@ -6,7 +6,7 @@
 /*   By: mneri <mneri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/09 15:23:29 by mneri             #+#    #+#             */
-/*   Updated: 2024/02/13 17:25:10 by mneri            ###   ########.fr       */
+/*   Updated: 2024/02/19 15:07:26 by mneri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,6 @@ BTC::BTC(const std::string &file_name)
    		std::string date;
         if (std::getline(iss, date, ',') && iss >> value) 
             this->db[date] = value;
-        else 
-            std::cerr << "Error parsing line: " << line << std::endl;
     }
 	db_file.close();
 }
@@ -52,37 +50,57 @@ BTC::BTC()
 {
 }
 
+void found(BTC btc, std::string value_str, std::string date_str)
+{
+		double value = std::strtod(value_str.c_str(), NULL);
+
+		if (value >= 0 && value < 2147483648)
+		{
+			std::cout << date_str << " => " << value_str << " = " << std::fixed << std::setprecision(2) << value * btc.db[date_str] << std::endl;
+		}
+		else if (value < 0)
+		{
+			std::cerr << "Error: not a positive number." << std::endl;
+		}
+		else
+		{
+			std::cerr << "Error: too large a number." << std::endl;
+		}
+}
+
+
+void not_found(BTC btc, std::string value_str, std::string date_str)
+{
+		std::map<std::string, double>::iterator it = btc.db.lower_bound(date_str);
+		if (it == btc.db.end() || it == btc.db.begin())
+			std::cerr << "Error: Can't find date in DB" << std::endl;
+		else
+		{
+			--it;
+			double value = std::strtod(value_str.c_str(), NULL);
+			if (value < 0)
+				std::cerr << "Error: not a positive number." << std::endl;
+			else if(value >= 2147483648)
+				std::cerr << "Error: too large a number." << std::endl;
+			else
+				std::cout << date_str << " => " << value_str << " = " << std::fixed << std::setprecision(2) << value * it->second << std::endl;
+		}
+}
+
 void displayBTC(std::string line, BTC btc)
 {
 	std::istringstream iss(line);
 	std::string date_str;
 	std::string value_str;
-	double value;
 
-	if(std::getline(iss, date_str, '|') && std::getline(iss, value_str))
-	{
-		if(btc.db.find(date_str) != btc.db.end())
-		{
-			value = std::strtod(value_str.c_str(), NULL);
-			std::cout << date_str << " => " << value_str << " = " << std::setprecision(2) <<  value * btc.db[date_str] << std::endl;
-		}
-		else
-		{
-			std::map<std::string, double>::iterator it = btc.db.lower_bound(date_str);
-			if(it == btc.db.begin())
-			{
-				std::cerr << "Can't find date in DB" << std::endl;
-			}
-			else
-			{
-				--it;
-				value = std::strtod(value_str.c_str(), NULL);
-								std::cout << date_str << " => " << value_str << " = " << value * btc.db[date_str] << std::endl;
-			}
-		}
-	}
-	else
-	{
-		std::cerr << "Error: not a valid line format => " << line << std::endl;
-	}
+	if (std::getline(iss, date_str, '|') && std::getline(iss, value_str))
+    {
+        if (btc.db.find(date_str) != btc.db.end())
+           found(btc, value_str, date_str);
+        else
+			not_found(btc, value_str, date_str);
+    }
+    else
+        std::cerr << "Error: not a valid line format => " << line << std::endl;
 }
+
