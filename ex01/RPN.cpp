@@ -6,7 +6,7 @@
 /*   By: mneri <mneri@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/19 15:23:22 by mneri             #+#    #+#             */
-/*   Updated: 2024/02/19 16:54:36 by mneri            ###   ########.fr       */
+/*   Updated: 2024/02/22 15:06:19 by mneri            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ void	calculate_stack(std::stack<int> *stack, char *arg, int i)
 				stack->push(result);
 				break;
 			case '/':
+				if(val == 0)
+					throw std::exception();
 				result = val2 / val;
 				stack->push(result);
 				break;
@@ -57,7 +59,15 @@ void parse_stack(char *arg)
 		{
 			if(stack.size() >= 2)
 			{	
-				calculate_stack(&stack, arg, i);
+				try
+				{
+					calculate_stack(&stack, arg, i);
+				}
+				catch(const std::exception& e)
+				{
+					std::cerr << e.what() << ": N / 0\n";
+					return ;
+				}
 				i++;
 			}
 			else
